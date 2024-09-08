@@ -27,11 +27,8 @@ const int LED_PIN_BLOQUEIO = 4;
 const int LED_PIN_MOVIMENTACAO = 5;
 
 // Configurações da rede Wi-Fi
-// const char* WIFI_SSID = "RONCHI";
-// const char* WIFI_PASSWORD = "umdoistres";
-
-const char* WIFI_SSID = "iPhone";
-const char* WIFI_PASSWORD = "123456789";
+const char* WIFI_SSID = "WIFI_SSID";
+const char* WIFI_PASSWORD = "WIFI_PASSWORD";
 
 // Configurações do broker MQTT
 const char* MQTT_SERVER = "broker.hivemq.com";
@@ -39,7 +36,7 @@ const int MQTT_PORT = 1883;
 const char* MQTT_TOPIC_CORDENADA = "topic-mototrace-cordenada";
 const char* MQTT_TOPIC_COMUNICACAO = "topic-mototrace-comunicacao";
 
-//Variaveis globais
+// Variaveis globais
 bool bloqueado = false;
 bool notificacaoAtivada = false;
 double globalLatitude = 0.0;
@@ -320,13 +317,14 @@ void setup() {
   clientComunicacao.setCallback(listenerComunicacao);
 
   xTaskCreatePinnedToCore(
-    EnviarCordenadas,    // Função de tarefa
-    "EnviarCordenadas",  // Nome da tarefa
-    8192,                // Tamanho da pilha (em bytes)
-    NULL,                // Parâmetro para passar para a tarefa
-    1,                   // Prioridade da tarefa
+    EnviarCordenadas,
+    "EnviarCordenadas",
+    8192,
     NULL,
-    1);
+    1,
+    NULL,
+    1
+  );
 
   xTaskCreatePinnedToCore(
     ColetarCordenadas,
@@ -335,7 +333,8 @@ void setup() {
     NULL,
     1,
     NULL,
-    1);
+    1
+  );
 
   xTaskCreatePinnedToCore(
     ComunicacaoServidor,
@@ -344,7 +343,8 @@ void setup() {
     NULL,
     1,
     NULL,
-    1);
+    1
+  );
 
   xTaskCreatePinnedToCore(
     VerificarMovimentacao,
@@ -353,7 +353,8 @@ void setup() {
     NULL,
     1,
     NULL,
-    1);
+    1
+  );
 }
 
 void loop() {}
