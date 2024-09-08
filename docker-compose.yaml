@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: postgres
+    container_name: postgres-container
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: mototrace
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+    volumes:
+      - mototrace-data:/var/lib/postgresql/data
+
+  mongodb:
+    image: mongo:5.0
+    container_name: mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: pass
+      TZ: America/Sao_Paulo
+    ports:
+      - "27017:27017"
+
+volumes:
+  mototrace-data:
