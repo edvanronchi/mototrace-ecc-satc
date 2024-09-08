@@ -1,0 +1,39 @@
+/* You can add global styles to this file, and also import other style files */
+
+// If you want to override variables do it here
+@import "variables";
+
+// Import styles with default layout.
+@import "@coreui/coreui/scss/coreui";
+
+// Import Chart.js custom tooltips styles
+@import "@coreui/chartjs/scss/coreui-chartjs";
+
+// Custom styles for this theme
+@import "theme";
+
+// Some temp fixes
+//@import "fixes";
+
+// If you want to add custom CSS you can put it here.
+@import "custom";
+
+// Examples
+// We use those styles to show code examples, you should remove them in your application.
+@import "examples";
+
+.cor-laranja {
+    filter: invert(58%) sepia(67%) saturate(4084%) hue-rotate(333deg) brightness(103%) contrast(101%) !important;;
+}
+
+.cor-azul {
+    filter: invert(64%) sepia(67%) saturate(4271%) hue-rotate(162deg) brightness(104%) contrast(107%) !important;;
+}
+
+.cor-verde {
+    filter: invert(60%) sepia(25%) saturate(5999%) hue-rotate(80deg) !important;
+}
+
+.cor-roxo {
+    filter: invert(39%) sepia(26%) saturate(4086%) hue-rotate(229deg) brightness(100%) contrast(87%) !important;;
+}

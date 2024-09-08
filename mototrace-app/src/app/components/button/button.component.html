@@ -1,0 +1,7 @@
+<button cButton [color]="color" (click)="onClick()">
+    @if (isLoading) {
+        <c-spinner aria-hidden="true" size="sm"></c-spinner>
+    } @else {
+        <ng-content></ng-content>
+    }
+</button>

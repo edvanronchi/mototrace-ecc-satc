@@ -1,0 +1,62 @@
+<c-row class="mb-2">
+    <c-col [md]="6" [xs]="12">
+        <button class="btn btn-success btn-responsive" type="button" (click)="openModalAdicionarDispositivos()">
+            <c-icon name="cil-plus"></c-icon>
+            Adicionar
+        </button>
+    </c-col>
+    <c-col [md]="6" [xs]="12" class="d-flex justify-content-start align-items-center">
+        <button class="btn btn-secondary me-2" type="button" (click)="buscarTodos()">
+            <c-icon name="cil-reload"></c-icon>
+        </button>
+
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Pesquisar..." aria-label="Persquisar" [(ngModel)]="pesquisa">
+            <button cButton [color]="'secondary'" style="pointer-events: none">
+                <svg cIcon name="cil-search"></svg>
+            </button>
+        </div>
+    </c-col>
+</c-row>
+<div class="table-responsive">
+    <table [striped]="true" style="min-width: 400px;" cTable>
+        <thead>
+        <tr>
+            <th scope="col" class="text-center">#</th>
+            <th scope="col" style="width: 30%;">Nome</th>
+            <th scope="col" style="width: 70%;">Descrição</th>
+            <th scope="col" class="text-center">Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+            @for (dispositivo of filtroDispositivos(); track dispositivo.id) {
+                <tr>
+                    <td class="text-center centralizar">
+                        <img src="assets/capacete.png" alt="Icone" class="icon-legenda"
+                             [ngClass]="getClassCor(dispositivo.cor)">
+                    </td>
+                    <td class="centralizar">{{ dispositivo.nome }}</td>
+                    <td class="centralizar">{{ dispositivo.descricao }}</td>
+                    <td>
+                        <div style="display: flex; gap: 3px;">
+                            <button cButton [color]="'warning'"
+                                    (click)="openModalAdicionarDispositivos(dispositivo.id)">
+                                <svg cIcon name="cil-pencil"></svg>
+                            </button>
+                            <button cButton [color]="'danger'"
+                                    (click)="remover(dispositivo.id)">
+                                <svg cIcon name="cil-trash"></svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<app-adicionar-dispositivos-modal
+    *ngIf="modalVisible"
+    (close)="destroyModal()"
+    (refresh)="buscarTodos()">
+</app-adicionar-dispositivos-modal>

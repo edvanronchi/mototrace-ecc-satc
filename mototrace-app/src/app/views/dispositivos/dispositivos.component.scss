@@ -1,0 +1,26 @@
+.table-responsive {
+    overflow-x: auto;
+}
+
+.icon-legenda {
+    width: 25px;
+    height: 25px;
+}
+
+.centralizar {
+    vertical-align: middle;
+}
+
+.circulo-color {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: blue;
+}
+
+@media (max-width: 768px) {
+    .btn-responsive {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+}

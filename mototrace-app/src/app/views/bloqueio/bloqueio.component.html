@@ -1,0 +1,91 @@
+<c-card class="mb-4">
+    <c-card-header>
+        Dispositivos
+    </c-card-header>
+    <c-card-body>
+        <c-row>
+            @for (dispositivo of dispositivos; track dispositivo.id; ) {
+                <c-col [lg]="4">
+                    <c-card [cBorder]="{top: {color: 'secondary', width: 3}}" class="mb-3">
+                        <c-card-header class="d-flex justify-content-between align-items-center">
+                            {{ dispositivo.nome }}
+                            <div>
+                                <img ngSrc="assets/capacete.png" alt="Icone" class="icon-legenda"
+                                     [ngClass]="getClassCor(dispositivo.cor)" height="512" width="512">
+                            </div>
+                        </c-card-header>
+                        <c-card-body>
+                            <p cCardText>
+                                {{ dispositivo.descricao }}
+                            </p>
+                            <div style="display: flex; gap: 3px; justify-content: flex-end;">
+                                <app-button [color]="'success'" *ngIf="!dispositivo.bloqueado"
+                                            [loading]="loading.bloquear.get(dispositivo.codigo)"
+                                            (buttonClick)="bloquear(dispositivo)">
+                                    <img ngSrc="assets/bloqueio/desbloqueado.png" alt="Icone" class="icon-legenda"
+                                         height="32" width="32">
+                                </app-button>
+                                <app-button [color]="'danger'" *ngIf="dispositivo.bloqueado"
+                                            [loading]="loading.desbloquear.get(dispositivo.codigo)"
+                                            (buttonClick)="desbloquear(dispositivo)">
+                                    <img ngSrc="assets/bloqueio/bloqueado.png" alt="Icone" class="icon-legenda"
+                                         height="32" width="32">
+                                </app-button>
+                                <app-button [color]="'info'" *ngIf="!dispositivo.notificacaoAtiva"
+                                            [loading]="loading.ativarNotificacao.get(dispositivo.codigo)"
+                                            (buttonClick)="ativarNotificacao(dispositivo)">
+                                    <img ngSrc="assets/bloqueio/notificacao-desativada.png" alt="Icone"
+                                         class="icon-legenda"
+                                         height="32" width="32">
+                                </app-button>
+                                <app-button [color]="'warning'" *ngIf="dispositivo.notificacaoAtiva"
+                                            [loading]="loading.desativarNotificacao.get(dispositivo.codigo)"
+                                            (buttonClick)="desativarNotificacao(dispositivo)">
+                                    <img ngSrc="assets/bloqueio/notificacao-ativa.png" alt="Icone" class="icon-legenda"
+                                         height="32" width="32">
+                                </app-button>
+                            </div>
+                        </c-card-body>
+                    </c-card>
+                </c-col>
+            }
+        </c-row>
+    </c-card-body>
+</c-card>
+
+<c-card class="mb-4">
+    <c-card-header>
+        Legenda
+    </c-card-header>
+    <c-card-body>
+        <c-col [lg]="12">
+            <c-callout color="danger">
+                <button cButton [color]="'danger'" class="button-legenda">
+                    <img class="icon-legenda" ngSrc="assets/bloqueio/bloqueado.png" alt="Icone" height="32" width="32">
+                </button>
+                Ignição da motocicleta bloqueada
+            </c-callout>
+            <c-callout color="success">
+                <button cButton [color]="'success'" class="button-legenda">
+                    <img class="icon-legenda" ngSrc="assets/bloqueio/desbloqueado.png" alt="Icone" height="32"
+                         width="32">
+                </button>
+                Ignição da motocicleta desbloqueada
+            </c-callout>
+            <c-callout color="warning">
+                <button cButton [color]="'warning'" class="button-legenda">
+                    <img class="icon-legenda" ngSrc="assets/bloqueio/notificacao-ativa.png" alt="Icone" height="32"
+                         width="32">
+                </button>
+                Notificação ativada para qualquer movimentação da motocicleta
+            </c-callout>
+            <c-callout color="info">
+                <button cButton [color]="'info'" class="button-legenda">
+                    <img class="icon-legenda" ngSrc="assets/bloqueio/notificacao-desativada.png" alt="Icone" height="32"
+                         width="32">
+                </button>
+                Notificação desativada para qualquer movimentação da motocicleta
+            </c-callout>
+        </c-col>
+    </c-card-body>
+</c-card>

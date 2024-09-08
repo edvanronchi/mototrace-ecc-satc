@@ -1,0 +1,51 @@
+<c-modal
+    id="liveDemoModal"
+    size="lg"
+    [visible]="visible"
+    (visibleChange)="handleOpenChange($event)">
+    <c-modal-header>
+        <h5 cModalTitle>{{ this.isEdit ? 'Editando' : 'Adicionando' }}</h5>
+        <button (click)="closeModal()" cButtonClose></button>
+    </c-modal-header>
+    <c-modal-body>
+        <c-row>
+            <c-col [md]="6" [xs]="12">
+                <label cLabel for="inputCodigo">Código UUID</label>
+                <input id="inputCodigo" cFormControl class="mb-3" [(ngModel)]="dispositivo.codigo"/>
+            </c-col>
+            <c-col [md]="6" [xs]="12" class="select-responsive">
+                <label cLabel for="selectCor" style="display: inline-flex;">Cor de referência
+                    <img src="assets/capacete.png" alt="Icone" class="icon-legenda" [ngClass]="selectedColorClass">
+                </label>
+                <select id="selectCor" aria-label="Escolha uma cor" cSelect [(ngModel)]="dispositivo.cor"
+                        (ngModelChange)="updateColorClass()">
+                    <option value="AZUL">Azul</option>
+                    <option value="LARANJA">Laranja</option>
+                    <option value="VERDE">Verde</option>
+                    <option value="ROXO">Roxo</option>
+                </select>
+            </c-col>
+        </c-row>
+        <c-row>
+            <c-col [md]="12">
+                <label cLabel for="inputNome">Nome</label>
+                <input id="inputNome" cFormControl class="mb-3" [(ngModel)]="dispositivo.nome"/>
+            </c-col>
+        </c-row>
+        <c-row>
+            <c-col [md]="12">
+                <label cLabel for="inputDescricao">Descrição</label>
+                <textarea id="inputDescricao" rows="3" cFormControl [(ngModel)]="dispositivo.descricao"></textarea>
+            </c-col>
+        </c-row>
+    </c-modal-body>
+    <c-modal-footer>
+        <button (click)="closeModal()" cButton color="secondary">
+            Fechar
+        </button>
+        <button cButton color="info" (click)="onSave()">
+            {{ this.isEdit ? 'Atualizar' : 'Salvar' }}
+        </button>
+    </c-modal-footer>
+</c-modal>
+
