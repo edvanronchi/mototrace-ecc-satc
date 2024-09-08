@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mototrace
+    username: user
+    password: pass
+    driverClassName: org.postgresql.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+server:
+  port: 8090
+  servlet:
+    context-path: /api/v1
