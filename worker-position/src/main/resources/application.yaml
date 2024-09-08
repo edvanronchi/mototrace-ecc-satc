@@ -1,0 +1,26 @@
+spring:
+  jackson:
+    time-zone: America/Sao_Paulo
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      username: user
+      password: pass
+      authentication-database: admin
+      database: mototrace
+
+
+server:
+  port: 8091
+  servlet:
+    context-path: /api/v1
+
+variaveis:
+  mqtt:
+    broker-url: tcp://broker.hivemq.com:1883
+    client-id-listener: WORKER_POSITION_LISTENER
+    client-id-producer: WORKER_POSITION_PRODUCER
+  feign:
+    mototrace-api:
+      url: http://localhost:8090/api/v1
