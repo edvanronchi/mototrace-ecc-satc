@@ -13,17 +13,14 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "cordenadas")
-public class Cordenada {
+@Document(collection = "coordenadas")
+public class Coordenada {
 
     @Id
     private String id;
-
     private String codigoDispositivo;
-
     private Double latitude;
-
     private Double longitude;
-
     private LocalDateTime dataHora = LocalDateTime.now();
+    private String codigoDispositivoAssociado;
 }

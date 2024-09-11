@@ -56,7 +56,7 @@ public class MqttListenerConfig {
 
     @Bean
     public MqttPahoMessageDrivenChannelAdapter inbound() {
-        MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(MQTT_CLIENT_ID, mqttClientFactoryListener(), MqttTopics.COMUNICACAO, MqttTopics.CORDENADA);
+        MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(MQTT_CLIENT_ID, mqttClientFactoryListener(), MqttTopics.COMUNICACAO, MqttTopics.COORDENADA);
         adapter.setCompletionTimeout(5000);
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setQos(1);
