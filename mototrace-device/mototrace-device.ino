@@ -8,23 +8,29 @@
 
 const String DISPOSITIVO_ID = "256b1d43-d7f4-468b-a597-74aa6f27033f";
 
-const int LIMITE_ROTACAO_PARA_NOTIFICACAO = 10000;
-const int SEGUNDOS_ENVIO_CORDENADAS = 5;
+const int SEGUNDOS_ENVIO_COORDENADAS = 5;
 const int SEGUNDOS_ESPERA_PROXIMA_MOVIMENTACAO = 10 ;
 
-// Definir os pinos I2C para o ESP32 MPU6050
+// Configurações do MPU6050
 const int MPU_PIN_SDA = 21;
 const int MPU_PIN_SCL = 22;
+const int LIMITE_ROTACAO_PARA_NOTIFICACAO = 3000;
 
-// Configura a Serial2 no ESP32 (pinos RX e TX)
+// Configurações do LoRa
+const int M0 = 4;
+const int M1 = 5;
+const int AUX = 18;
+const int RXD1 = 19;
+const int TXD1 = 23;
+
+// Configurações do GPS
 const int RXD2 = 16;
 const int TXD2 = 17;
 const double LIMITE_DIFERENCA_LOCALIZACAO = 0.00001;
 
-// Definir o pino do LED
+// Pinos dos LEDs
 const int LED_PIN_NOTIFICACAO = 2;
-const int LED_PIN_BLOQUEIO = 4;
-const int LED_PIN_MOVIMENTACAO = 5;
+const int LED_PIN_BLOQUEIO = 15;
 
 // Configurações da rede Wi-Fi
 const char* WIFI_SSID = "WIFI_SSID";
@@ -33,7 +39,7 @@ const char* WIFI_PASSWORD = "WIFI_PASSWORD";
 // Configurações do broker MQTT
 const char* MQTT_SERVER = "broker.hivemq.com";
 const int MQTT_PORT = 1883;
-const char* MQTT_TOPIC_CORDENADA = "topic-mototrace-cordenada";
+const char* MQTT_TOPIC_COORDENADA = "topic-mototrace-coordenada";
 const char* MQTT_TOPIC_COMUNICACAO = "topic-mototrace-comunicacao";
 
 // Variaveis globais
@@ -46,12 +52,13 @@ double globalLongitudeEnviada = 0.0;
 
 MPU6050 mpu;
 TinyGPSPlus gps;
-WiFiClient espClientCordenada;
+WiFiClient espClientCoordenada;
 WiFiClient espClientComunicacao;
-PubSubClient clientCordenada(espClientCordenada);
+PubSubClient clientCoordenada(espClientCoordenada);
 PubSubClient clientComunicacao(espClientComunicacao);
+
+HardwareSerial SerialLORA(1);
 HardwareSerial SerialGPS(2);
-SemaphoreHandle_t xMutex;
 
 void setupWifi() {
   Serial.print("Conectando-se a ");
@@ -147,18 +154,18 @@ void enviarMensagemRetorno(StaticJsonDocument<200> mensagem) {
   clientComunicacao.publish(MQTT_TOPIC_COMUNICACAO, mensagemEnvio.c_str());
 }
 
-void reconnectCordenada() {
-  while (!clientCordenada.connected()) {
-    Serial.println("#cordenada: Conectando ao broker MQTT...");
-    String clientId = String(DISPOSITIVO_ID) + "-cordenada";
+void reconnectCoordenada() {
+  while (!clientCoordenada.connected()) {
+    Serial.println("#coordenada: Conectando ao broker MQTT...");
+    String clientId = String(DISPOSITIVO_ID) + "-coordenada";
 
-    if (clientCordenada.connect(clientId.c_str())) {
-      Serial.println("#cordenada: Conectado");
+    if (clientCoordenada.connect(clientId.c_str())) {
+      Serial.println("#coordenada: Conectado");
       return;
     }
 
-    Serial.print("#cordenada: falhou, rc=");
-    Serial.print(clientCordenada.state());
+    Serial.print("#coordenada: falhou, rc=");
+    Serial.print(clientCoordenada.state());
   }
 }
 
@@ -178,7 +185,7 @@ void reconnectComunicacao() {
   }
 }
 
-String montarMensagemCordenada() {
+String montarMensagemCoordenada() {
   StaticJsonDocument<200> doc;
 
   doc["codigoDispositivo"] = DISPOSITIVO_ID;
@@ -208,41 +215,13 @@ void enviarNotificacao() {
   Serial.println("Publicando mensagem de notificação de movimentação: ");
   String mensagemEnvio = montarMensagemNotificacaoMovimentacao();
   clientComunicacao.publish(MQTT_TOPIC_COMUNICACAO, mensagemEnvio.c_str());
-  digitalWrite(LED_PIN_MOVIMENTACAO, HIGH);
-}
+  
+  for (int i = 0; i < 5; i++) {
+    digitalWrite(LED_PIN_NOTIFICACAO, LOW);
+    vTaskDelay(250 / portTICK_PERIOD_MS);
 
-void EnviarCordenadas(void* parameter) {
-  for (;;) {
-    if (!clientCordenada.connected()) {
-      reconnectCordenada();
-    }
-
-    clientCordenada.loop();
-
-    if (globalLatitude == 0 || globalLongitude == 0) {
-      Serial.println("Não foi encontrado a localização");
-      vTaskDelay((SEGUNDOS_ENVIO_CORDENADAS * 2 * 1000) / portTICK_PERIOD_MS);
-      continue;
-    }
-
-    double deltaLat = abs(globalLatitude - globalLatitudeEnviada);
-    double deltaLng = abs(globalLongitude - globalLongitudeEnviada);
-
-    if (deltaLat <= LIMITE_DIFERENCA_LOCALIZACAO && deltaLng <= LIMITE_DIFERENCA_LOCALIZACAO) {
-      Serial.println("Localização está no mesmo lugar");
-      vTaskDelay((SEGUNDOS_ENVIO_CORDENADAS * 2 * 1000) / portTICK_PERIOD_MS);
-      continue;
-    }
-
-    Serial.println("Publicando mensagem de cordenada: ");
-    String cordenada = montarMensagemCordenada();
-
-    clientCordenada.publish(MQTT_TOPIC_CORDENADA, cordenada.c_str());
-
-    globalLatitudeEnviada = globalLatitude;
-    globalLongitudeEnviada = globalLongitude;
-
-    vTaskDelay((SEGUNDOS_ENVIO_CORDENADAS * 1000) / portTICK_PERIOD_MS);
+    digitalWrite(LED_PIN_NOTIFICACAO, HIGH);
+    vTaskDelay(250 / portTICK_PERIOD_MS);
   }
 }
 
@@ -268,12 +247,11 @@ void VerificarMovimentacao(void* parameter) {
       vTaskDelay((SEGUNDOS_ESPERA_PROXIMA_MOVIMENTACAO * 1000) / portTICK_PERIOD_MS);
     }
 
-    digitalWrite(LED_PIN_MOVIMENTACAO, LOW);
     vTaskDelay(500 / portTICK_PERIOD_MS);
   }
 }
 
-void ColetarCordenadas(void* parameter) {
+void ColetarCoordenadas(void* parameter) {
   for (;;) {
     if (SerialGPS.available() <= 0) {
       vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -297,28 +275,86 @@ void ColetarCordenadas(void* parameter) {
   }
 }
 
+void EnviarCoordenadas(void* parameter) {
+  for (;;) {
+    if (!clientCoordenada.connected()) {
+      reconnectCoordenada();
+    }
+
+    clientCoordenada.loop();
+
+    if (globalLatitude == 0 || globalLongitude == 0) {
+      Serial.println("Não foi encontrado a localização");
+      vTaskDelay((SEGUNDOS_ENVIO_COORDENADAS * 2 * 1000) / portTICK_PERIOD_MS);
+      continue;
+    }
+
+    double deltaLat = abs(globalLatitude - globalLatitudeEnviada);
+    double deltaLng = abs(globalLongitude - globalLongitudeEnviada);
+
+    if (deltaLat <= LIMITE_DIFERENCA_LOCALIZACAO && deltaLng <= LIMITE_DIFERENCA_LOCALIZACAO) {
+      Serial.println("Localização está no mesmo lugar");
+      vTaskDelay((SEGUNDOS_ENVIO_COORDENADAS * 2 * 1000) / portTICK_PERIOD_MS);
+      continue;
+    }
+
+    Serial.println("Publicando mensagem de coordenada: ");
+    String coordenada = montarMensagemCoordenada();
+
+    clientCoordenada.publish(MQTT_TOPIC_COORDENADA, coordenada.c_str());
+
+    globalLatitudeEnviada = globalLatitude;
+    globalLongitudeEnviada = globalLongitude;
+
+    vTaskDelay((SEGUNDOS_ENVIO_COORDENADAS * 1000) / portTICK_PERIOD_MS);
+  }
+}
+
+void ReceberCoordenadasLoRaWAN(void* parameter) {
+  for (;;) {
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+  }
+}
+
+void EnviarCoordenadasLoRaWAN(void* parameter) {
+  for (;;) {
+    if (WiFi.status() == WL_CONNECTED) {
+      vTaskDelay(3000 / portTICK_PERIOD_MS);
+      continue;
+    }
+
+    vTaskDelay((SEGUNDOS_ENVIO_COORDENADAS * 1000) / portTICK_PERIOD_MS);
+  }
+}
+
 void setup() {
   Serial.begin(115200);
+  SerialLORA.begin(9600, SERIAL_8N1, RXD1, TXD1);
   SerialGPS.begin(9600, SERIAL_8N1, RXD2, TXD2);
 
   Wire.begin(MPU_PIN_SDA, MPU_PIN_SCL);
 
+  pinMode(M0, OUTPUT);
+  pinMode(M1, OUTPUT);
+  pinMode(AUX, INPUT);
   pinMode(LED_PIN_BLOQUEIO, OUTPUT);
   pinMode(LED_PIN_NOTIFICACAO, OUTPUT);
-  pinMode(LED_PIN_MOVIMENTACAO, OUTPUT);
+
+  digitalWrite(M0, LOW);
+  digitalWrite(M1, LOW);
 
   delay(2000);
 
   setupWifi();
   setupMpu();
 
-  clientCordenada.setServer(MQTT_SERVER, MQTT_PORT);
+  clientCoordenada.setServer(MQTT_SERVER, MQTT_PORT);
   clientComunicacao.setServer(MQTT_SERVER, MQTT_PORT);
   clientComunicacao.setCallback(listenerComunicacao);
 
   xTaskCreatePinnedToCore(
-    EnviarCordenadas,
-    "EnviarCordenadas",
+    EnviarCoordenadas,
+    "EnviarCoordenadas",
     8192,
     NULL,
     1,
@@ -327,8 +363,8 @@ void setup() {
   );
 
   xTaskCreatePinnedToCore(
-    ColetarCordenadas,
-    "ColetarCordenadas",
+    ColetarCoordenadas,
+    "ColetarCoordenadas",
     8192,
     NULL,
     1,
@@ -355,6 +391,26 @@ void setup() {
     NULL,
     1
   );
+
+  // xTaskCreatePinnedToCore(
+  //   EnviarCoordenadasLoRaWAN,
+  //   "EnviarCoordenadasLoRaWAN",
+  //   8192,
+  //   NULL,
+  //   1,
+  //   NULL,
+  //   1
+  // );
+
+  // xTaskCreatePinnedToCore(
+  //   ReceberCoordenadasLoRaWAN,
+  //   "ReceberCoordenadasLoRaWAN",
+  //   8192,
+  //   NULL,
+  //   1,
+  //   NULL,
+  //   1
+  // );
 }
 
 void loop() {}
