@@ -1,4 +1,4 @@
-export interface Cordenada {
+export interface Coordenada {
     id: string;
     codigoDispositivo: string;
     latitude: number;

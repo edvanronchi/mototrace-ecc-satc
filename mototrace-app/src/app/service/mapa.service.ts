@@ -1,22 +1,23 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {Cordenada} from "../../models/Cordenada";
+import {Coordenada} from "../../models/Coordenada";
+import {API_URL_COORDENADAS} from "../constants/constants";
 
 @Injectable({
     providedIn: 'root'
 })
 export class MapaService {
-    private apiUrl: string = 'http://localhost:8091/api/v1/cordenadas';
+    private apiUrl: string = API_URL_COORDENADAS + '/dispositivo-comunicacao';
 
     constructor(private http: HttpClient) {
     }
 
-    buscarCordenadas() : Observable<Cordenada[]> {
-        return this.http.get<Cordenada[]>(this.apiUrl);
+    buscarCoordenadas() : Observable<Coordenada[]> {
+        return this.http.get<Coordenada[]>(this.apiUrl);
     }
 
-    buscarUltimasCordenadas(dispositivosCodigo: string) : Observable<Cordenada[]> {
-        return this.http.get<Cordenada[]>(this.apiUrl + '/ultimas-cordenadas', {params: {dispositivosCodigo}});
+    buscarUltimasCoordenadas(dispositivosCodigo: string) : Observable<Coordenada[]> {
+        return this.http.get<Coordenada[]>(this.apiUrl + '/ultimas-coordenadas', {params: {dispositivosCodigo}});
     }
 }

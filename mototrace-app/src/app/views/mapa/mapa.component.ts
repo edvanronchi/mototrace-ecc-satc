@@ -6,7 +6,7 @@ import {DispositivoService} from "../../service/dispositivo.service";
 import {MapaService} from "../../service/mapa.service";
 import {forkJoin, Observable} from "rxjs";
 import {Dispositivo} from "../../../models/Dispositivo";
-import {Cordenada} from "../../../models/Cordenada";
+import {Coordenada} from "../../../models/Coordenada";
 import {CorHexadecimal} from "../../../models/Cor";
 
 @Component({
@@ -30,18 +30,18 @@ export class MapaComponent implements OnInit, OnDestroy {
         clearInterval(this.intervalId);
     }
 
-    async buscarDispositivosCordenadas(): Promise<{ dispositivos: Dispositivo[], cordenadas: Cordenada[] }> {
+    async buscarDispositivosCoordenadas(): Promise<{ dispositivos: Dispositivo[], coordenadas: Coordenada[] }> {
         return new Promise((resolve) => {
             forkJoin({
                 dispositivos: this.dispositivoService.buscarTodos(),
-                cordenadas: this.mapaService.buscarCordenadas()
+                coordenadas: this.mapaService.buscarCoordenadas()
             }).subscribe(resultado => resolve(resultado));
         });
     }
 
-    buscarDispositivosUltimasCordenadas(dispositivos: Dispositivo[]): Observable<Cordenada[]> {
+    buscarDispositivosUltimasCoordenadas(dispositivos: Dispositivo[]): Observable<Coordenada[]> {
         const dispositivosCodigo = dispositivos.map(dispositivo => dispositivo.codigo).join(',');
-        return this.mapaService.buscarUltimasCordenadas(dispositivosCodigo);
+        return this.mapaService.buscarUltimasCoordenadas(dispositivosCodigo);
     }
 
     async initMap() {
@@ -57,7 +57,7 @@ export class MapaComponent implements OnInit, OnDestroy {
             center: {lat: -12.286562123662781, lng: -49.4714931964791}
         });
 
-        let {dispositivos, cordenadas} = await this.buscarDispositivosCordenadas();
+        let {dispositivos, coordenadas} = await this.buscarDispositivosCoordenadas();
         let ultimosMarcadores: any = {};
         let ultimosPolylines: any = {};
         let ultimosCirculos: any = {};
@@ -66,53 +66,53 @@ export class MapaComponent implements OnInit, OnDestroy {
             return;
         }
 
-        if (cordenadas.length) {
+        if (coordenadas.length) {
             map.setZoom(16);
-            map.setCenter({lat: cordenadas[cordenadas.length - 1].latitude, lng: cordenadas[cordenadas.length - 1].longitude});
+            map.setCenter({lat: coordenadas[coordenadas.length - 1].latitude, lng: coordenadas[coordenadas.length - 1].longitude});
         }
 
         const iniciarAtualizacaoMarcador = () => {
             let entrou = false;
             this.intervalId = setInterval(() => {
-                this.buscarDispositivosUltimasCordenadas(dispositivos).subscribe(ultimasCordenadas => {
-                    if (!ultimasCordenadas.length) {
+                this.buscarDispositivosUltimasCoordenadas(dispositivos).subscribe(ultimasCoordenadas => {
+                    if (!ultimasCoordenadas.length) {
                         return;
                     }
 
                     if (!entrou) {
                         map.setZoom(16);
-                        map.setCenter({lat: ultimasCordenadas[0].latitude, lng: ultimasCordenadas[0].longitude});
+                        map.setCenter({lat: ultimasCoordenadas[0].latitude, lng: ultimasCoordenadas[0].longitude});
                         entrou = true;
                     }
-                    cordenadas.push(...ultimasCordenadas);
-                    dispositivos.forEach(processarDispositivosCordenadas);
+                    coordenadas.push(...ultimasCoordenadas);
+                    dispositivos.forEach(processarDispositivosCoordenadas);
                 })
             }, 4000);
         }
 
-        dispositivos.forEach(processarDispositivosCordenadas);
+        dispositivos.forEach(processarDispositivosCoordenadas);
         iniciarAtualizacaoMarcador();
 
         function getColorHex(cor: string) {
             return CorHexadecimal[cor as keyof typeof CorHexadecimal];
         }
 
-        function processarDispositivosCordenadas(dispositivo: Dispositivo) {
-            const cordenadasDispositivo = cordenadas.filter(cordenada => cordenada.codigoDispositivo === dispositivo.codigo);
+        function processarDispositivosCoordenadas(dispositivo: Dispositivo) {
+            const coordenadasDispositivo = coordenadas.filter(coordenada => coordenada.codigoDispositivo === dispositivo.codigo);
 
-            if (!cordenadasDispositivo.length) {
+            if (!coordenadasDispositivo.length) {
                 return;
             }
 
             const colorHex = getColorHex(dispositivo.cor);
-            const ultimaCordenada = cordenadasDispositivo[cordenadasDispositivo.length - 1];
+            const ultimaCoordenada = coordenadasDispositivo[coordenadasDispositivo.length - 1];
 
-            gerarRotaHistorico(dispositivo, cordenadasDispositivo, colorHex);
-            gerarMarcadorUltimaLocalizacao(dispositivo, ultimaCordenada, colorHex);
+            gerarRotaHistorico(dispositivo, coordenadasDispositivo, colorHex);
+            gerarMarcadorUltimaLocalizacao(dispositivo, ultimaCoordenada, colorHex);
         }
 
-        function gerarRotaHistorico(dispositivo: Dispositivo, cordenadasDispositivo: Cordenada[], colorHex: string) {
-            const path = cordenadasDispositivo.map(cordenada => ({lat: cordenada.latitude, lng: cordenada.longitude}));
+        function gerarRotaHistorico(dispositivo: Dispositivo, coordenadasDispositivo: Coordenada[], colorHex: string) {
+            const path = coordenadasDispositivo.map(coordenada => ({lat: coordenada.latitude, lng: coordenada.longitude}));
 
             if (ultimosPolylines[dispositivo.codigo]) {
                 ultimosPolylines[dispositivo.codigo].setMap(null);
@@ -144,7 +144,7 @@ export class MapaComponent implements OnInit, OnDestroy {
             return `${diaFormatado}/${mesFormatado}/${anoFormatado} ${horasFormatadas}:${minutosFormatados}:${segundosFormatados}`;
         }
 
-        function gerarMarcadorUltimaLocalizacao(dispositivo: Dispositivo, cordenada: Cordenada, colorHex: string) {
+        function gerarMarcadorUltimaLocalizacao(dispositivo: Dispositivo, coordenada: Coordenada, colorHex: string) {
             const icon = document.createElement('div_' + dispositivo.codigo);
             icon.innerHTML = `<img src="assets/capacete.png" style="width: 20px; height: 20px;" alt="">`;
 
@@ -164,7 +164,7 @@ export class MapaComponent implements OnInit, OnDestroy {
             });
 
             const infoWindow = new google.maps.InfoWindow({
-                content: `<div style="color: black; margin: 5px"><strong>Ultima localização: </strong>${formatarDataHora(cordenada.dataHora)}</div>`
+                content: `<div style="color: black; margin: 5px"><strong>Ultima localização: </strong>${formatarDataHora(coordenada.dataHora)}</div>`
             });
 
             const marker = new AdvancedMarkerElement({
@@ -172,7 +172,7 @@ export class MapaComponent implements OnInit, OnDestroy {
                 title: dispositivo.nome,
                 gmpClickable: true,
                 content: pin.element,
-                position: {lat: cordenada.latitude, lng: cordenada.longitude}
+                position: {lat: coordenada.latitude, lng: coordenada.longitude}
             });
 
             const circle = new google.maps.Circle({
@@ -182,7 +182,7 @@ export class MapaComponent implements OnInit, OnDestroy {
                 fillColor: colorHex,
                 fillOpacity: 0.2,
                 map: map,
-                center: {lat: cordenada.latitude, lng: cordenada.longitude},
+                center: {lat: coordenada.latitude, lng: coordenada.longitude},
                 radius: 50
             });
 
