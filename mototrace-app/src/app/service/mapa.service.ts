@@ -8,7 +8,7 @@ import {API_URL_COORDENADAS} from "../constants/constants";
     providedIn: 'root'
 })
 export class MapaService {
-    private apiUrl: string = API_URL_COORDENADAS + '/dispositivo-comunicacao';
+    private apiUrl: string = API_URL_COORDENADAS + '/coordenadas';
 
     constructor(private http: HttpClient) {
     }
