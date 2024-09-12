@@ -6,10 +6,10 @@
 #include <PubSubClient.h>
 #include <HardwareSerial.h>
 
-const String DISPOSITIVO_ID = "256b1d43-d7f4-468b-a597-74aa6f27033f";
+const String DISPOSITIVO_ID = "XYZ_1";
 
 const int SEGUNDOS_ENVIO_COORDENADAS = 5;
-const int SEGUNDOS_ESPERA_PROXIMA_MOVIMENTACAO = 10 ;
+const int SEGUNDOS_ESPERA_PROXIMA_MOVIMENTACAO = 10;
 
 // Configurações do MPU6050
 const int MPU_PIN_SDA = 21;
@@ -22,6 +22,7 @@ const int M1 = 5;
 const int AUX = 18;
 const int RXD1 = 19;
 const int TXD1 = 23;
+const int BUFFER_MENSAGEM_LORA = 58;
 
 // Configurações do GPS
 const int RXD2 = 16;
@@ -88,16 +89,16 @@ void setupMpu() {
   }
 }
 
-String montarMensagemRecebida(byte* payload, unsigned int length) {
-  String receivedMessage = "";
+String montarMensagemRecebidaComunicacao(byte* payload, unsigned int length) {
+  String mensagemRecebida = "";
   for (int i = 0; i < length; i++) {
-    receivedMessage += (char)payload[i];
+    mensagemRecebida += (char)payload[i];
   }
-  return receivedMessage;
+  return mensagemRecebida;
 }
 
 void listenerComunicacao(char* topic, byte* payload, unsigned int length) {
-  String mensagemRecebida = montarMensagemRecebida(payload, length);
+  String mensagemRecebida = montarMensagemRecebidaComunicacao(payload, length);
 
   StaticJsonDocument<200> mensagem;
   DeserializationError error = deserializeJson(mensagem, mensagemRecebida);
@@ -198,6 +199,12 @@ String montarMensagemCoordenada() {
   return mensagem;
 }
 
+String montarMensagemCoordenadaLoRaWAN() {
+  char mensagem[BUFFER_MENSAGEM_LORA];
+  snprintf(mensagem, BUFFER_MENSAGEM_LORA, "|%s,%.5f,%.5f|", DISPOSITIVO_ID.c_str(), globalLatitude, globalLongitude);
+  return String(mensagem);
+}
+
 String montarMensagemNotificacaoMovimentacao() {
   StaticJsonDocument<200> doc;
 
@@ -215,7 +222,7 @@ void enviarNotificacao() {
   Serial.println("Publicando mensagem de notificação de movimentação: ");
   String mensagemEnvio = montarMensagemNotificacaoMovimentacao();
   clientComunicacao.publish(MQTT_TOPIC_COMUNICACAO, mensagemEnvio.c_str());
-  
+
   for (int i = 0; i < 5; i++) {
     digitalWrite(LED_PIN_NOTIFICACAO, LOW);
     vTaskDelay(250 / portTICK_PERIOD_MS);
@@ -223,6 +230,42 @@ void enviarNotificacao() {
     digitalWrite(LED_PIN_NOTIFICACAO, HIGH);
     vTaskDelay(250 / portTICK_PERIOD_MS);
   }
+}
+
+String montarMensagemRecebidaLoRaWAN() {
+  String mensagemRecebida = "";
+  while (SerialLORA.available()) {
+    mensagemRecebida += (char)SerialLORA.read();
+  }
+
+  if (mensagemRecebida.length() == 0 || mensagemRecebida.charAt(0) != '|' || mensagemRecebida.charAt(mensagemRecebida.length() - 1) != '|') {
+    return "";
+  }
+
+  mensagemRecebida = mensagemRecebida.substring(1, mensagemRecebida.length() - 1);
+
+  int firstCommaIndex = mensagemRecebida.indexOf(',');
+  int secondCommaIndex = mensagemRecebida.indexOf(',', firstCommaIndex + 1);
+
+  StaticJsonDocument<200> doc;
+
+  doc["codigoDispositivo"] = mensagemRecebida.substring(0, firstCommaIndex);
+  doc["latitude"] = mensagemRecebida.substring(firstCommaIndex + 1, secondCommaIndex).toDouble();
+  doc["longitude"] = mensagemRecebida.substring(secondCommaIndex + 1).toDouble();
+
+  String mensagem;
+  serializeJson(doc, mensagem);
+
+  return mensagem;
+}
+
+void enviarCoordenadaComDispositivoAssociado(StaticJsonDocument<200> mensagem) {
+  mensagem["codigoDispositivoAssociado"] = DISPOSITIVO_ID;
+
+  String mensagemEnvio;
+  serializeJson(mensagem, mensagemEnvio);
+
+  clientComunicacao.publish(MQTT_TOPIC_COORDENADA, mensagemEnvio.c_str());
 }
 
 void ComunicacaoServidor(void* parameter) {
@@ -264,8 +307,8 @@ void ColetarCoordenadas(void* parameter) {
       globalLatitude = gps.location.lat();
       globalLongitude = gps.location.lng();
 
-      Serial.println(globalLatitude, 6);
-      Serial.println(globalLongitude, 6);
+      Serial.println(globalLatitude, 5);
+      Serial.println(globalLongitude, 5);
 
       vTaskDelay(2000 / portTICK_PERIOD_MS);
     } else {
@@ -312,7 +355,29 @@ void EnviarCoordenadas(void* parameter) {
 
 void ReceberCoordenadasLoRaWAN(void* parameter) {
   for (;;) {
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    if (SerialLORA.available() <= 0) {
+      vTaskDelay(500 / portTICK_PERIOD_MS);
+      continue;
+    }
+
+    String coordenadaRecebida = montarMensagemRecebidaLoRaWAN();
+
+    if (!coordenadaRecebida) {
+      continue;
+    }
+
+    StaticJsonDocument<200> mensagem;
+    DeserializationError error = deserializeJson(mensagem, coordenadaRecebida);
+
+    if (error) {
+      Serial.print(F("Falha ao fazer parse do JSON: "));
+      Serial.println(error.f_str());
+      vTaskDelay(500 / portTICK_PERIOD_MS);
+      continue;
+    }
+
+    Serial.println("Mensagem recebida via LoRaWAN: " + coordenadaRecebida);
+    enviarCoordenadaComDispositivoAssociado(mensagem);
   }
 }
 
@@ -322,6 +387,17 @@ void EnviarCoordenadasLoRaWAN(void* parameter) {
       vTaskDelay(3000 / portTICK_PERIOD_MS);
       continue;
     }
+
+    if (globalLatitude == 0 || globalLongitude == 0) {
+      Serial.println("Não foi encontrado a localização");
+      vTaskDelay((SEGUNDOS_ENVIO_COORDENADAS * 2 * 1000) / portTICK_PERIOD_MS);
+      continue;
+    }
+
+    String mensagem = montarMensagemCoordenadaLoRaWAN();
+
+    SerialLORA.print(mensagem.c_str());
+    Serial.println("Mensagem enviada via LoRaWAN: " + mensagem);
 
     vTaskDelay((SEGUNDOS_ENVIO_COORDENADAS * 1000) / portTICK_PERIOD_MS);
   }
@@ -359,8 +435,7 @@ void setup() {
     NULL,
     1,
     NULL,
-    1
-  );
+    1);
 
   xTaskCreatePinnedToCore(
     ColetarCoordenadas,
@@ -369,8 +444,7 @@ void setup() {
     NULL,
     1,
     NULL,
-    1
-  );
+    1);
 
   xTaskCreatePinnedToCore(
     ComunicacaoServidor,
@@ -379,8 +453,7 @@ void setup() {
     NULL,
     1,
     NULL,
-    1
-  );
+    1);
 
   xTaskCreatePinnedToCore(
     VerificarMovimentacao,
@@ -389,28 +462,25 @@ void setup() {
     NULL,
     1,
     NULL,
-    1
-  );
+    1);
 
-  // xTaskCreatePinnedToCore(
-  //   EnviarCoordenadasLoRaWAN,
-  //   "EnviarCoordenadasLoRaWAN",
-  //   8192,
-  //   NULL,
-  //   1,
-  //   NULL,
-  //   1
-  // );
+  xTaskCreatePinnedToCore(
+    EnviarCoordenadasLoRaWAN,
+    "EnviarCoordenadasLoRaWAN",
+    8192,
+    NULL,
+    1,
+    NULL,
+    1);
 
-  // xTaskCreatePinnedToCore(
-  //   ReceberCoordenadasLoRaWAN,
-  //   "ReceberCoordenadasLoRaWAN",
-  //   8192,
-  //   NULL,
-  //   1,
-  //   NULL,
-  //   1
-  // );
+  xTaskCreatePinnedToCore(
+    ReceberCoordenadasLoRaWAN,
+    "ReceberCoordenadasLoRaWAN",
+    8192,
+    NULL,
+    1,
+    NULL,
+    1);
 }
 
 void loop() {}
