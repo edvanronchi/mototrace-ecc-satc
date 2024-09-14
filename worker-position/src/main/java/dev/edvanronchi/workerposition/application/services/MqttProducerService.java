@@ -1,7 +1,6 @@
 package dev.edvanronchi.workerposition.application.services;
 
 import dev.edvanronchi.workerposition.infra.gateway.MqttGateway;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
