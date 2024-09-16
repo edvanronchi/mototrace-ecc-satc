@@ -55,6 +55,7 @@ Um resumo das funções atendidas por cada aplicação.
 - [mototrace-device](mototrace-device/README.md)
 
 ### 2.3 Diagrama de Arquitetura
+![](images/diagram.gif)
 
 ## 3. Instalação
 
