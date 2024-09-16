@@ -20,14 +20,15 @@ A seguir, algumas das principais tecnologias e ferramentas empregadas no projeto
 
 #### Front-end
 - Angular 18
-- Core UI Angular
+- Template Core UI
 - Google Maps
 
 #### Back-end
 - Java 21
 - Spring Boot 3.3.2
-- Feign Client
 - Spring Integration MQTT
+- Spring Cloud Gateway
+- Spring Cloud OpenFeign
 
 #### Dispositivo Rastreador (ESP32)
 - MPU6050: Sensor de movimento
@@ -36,17 +37,18 @@ A seguir, algumas das principais tecnologias e ferramentas empregadas no projeto
 - FreeRTOS: Biblioteca que gerencia múltiplas tarefas com threads
 - LoRa (Ebyte E32): Módulo para comunicação de longo alcance
 
-### Banco de dados
+#### Banco de dados
 - PostgreSQL
 - MongoDB
 
-### Infra
+#### Infra
 - Docker
 - Docker Compose
 
 ### 2.2 Microserviços
 Um resumo das funções atendidas por cada aplicação.
 
+- [gateway-api](gateway-api/README.md)
 - [mototrace-app](mototrace-app/README.md)
 - [mototrace-api](mototrace-api/README.md)
 - [worker-position](worker-position/README.md)
@@ -57,14 +59,14 @@ Um resumo das funções atendidas por cada aplicação.
 ## 3. Instalação
 
 ### 3.1 Pré-requisitos
-Certifique-se de que o Docker está instalado e funcionando corretamente em seu sistema. Verifique se as portas 8080, 8090, 10000, 10001 e 10002 não estão atualmente em uso.
+Certifique-se de que o Docker está instalado e funcionando corretamente em seu sistema. Verifique se as portas 8080, 8090, 8091, e 8092 não estão atualmente em uso.
 
 ### 3.2 Instruções de Instalação
 Execute o seguinte comando para criar e iniciar os contêineres necessários:
 
 ### 3.3 Acesso à Aplicação
 ```
-http://localhost:4000/#
+http://localhost:4200
 ```
 
 ## 4. xxx

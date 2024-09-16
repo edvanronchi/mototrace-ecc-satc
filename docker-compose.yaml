@@ -1,4 +1,34 @@
 services:
+  gateway-api:
+    build:
+      context: gateway-api
+    container_name: gateway-api
+    restart: always
+    ports:
+      - "8090:8090"
+
+  mototrace-api:
+    build:
+      context: mototrace-api
+    container_name: mototrace-api
+    restart: always
+    ports:
+      - "8091:8091"
+    depends_on:
+      postgres:
+        condition: service_started
+
+  worker-position:
+    build:
+      context: worker-position
+    container_name: worker-position
+    restart: always
+    ports:
+      - "8092:8092"
+    depends_on:
+      mongodb:
+        condition: service_started
+
   postgres:
     image: postgres
     container_name: postgres-container

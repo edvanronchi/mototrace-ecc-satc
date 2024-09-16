@@ -2,13 +2,13 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {Dispositivo} from "../../models/Dispositivo";
-import {API_URL_COORDENADAS} from "../constants/constants";
+import {URL_GATEWAY_API} from "../constants/constants";
 
 @Injectable({
     providedIn: 'root'
 })
 export class BloqueioService {
-    private apiUrl: string = API_URL_COORDENADAS + '/dispositivo-comunicacao';
+    private apiUrl: string = URL_GATEWAY_API + '/worker-position/dispositivo-comunicacao';
 
     constructor(private http: HttpClient) {
     }

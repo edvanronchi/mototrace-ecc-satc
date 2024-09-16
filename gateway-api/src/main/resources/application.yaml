@@ -1,0 +1,22 @@
+server:
+  port: 8090
+  servlet:
+    context-path: /api/v1
+
+spring:
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: mototrace-api
+            uri: http://localhost:8091/api/v1
+            predicates:
+              - Path=/mototrace-api/**
+            filters:
+              - RewritePath=/mototrace-api/?(?<segment>.*), /${segment}
+          - id: worker-position
+            uri: http://localhost:8092/api/v1
+            predicates:
+              - Path=/worker-position/**
+            filters:
+              - RewritePath=/worker-position/?(?<segment>.*), /${segment}

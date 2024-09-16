@@ -2,13 +2,13 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {Coordenada} from "../../models/Coordenada";
-import {API_URL_COORDENADAS} from "../constants/constants";
+import {URL_GATEWAY_API} from "../constants/constants";
 
 @Injectable({
     providedIn: 'root'
 })
 export class MapaService {
-    private apiUrl: string = API_URL_COORDENADAS + '/coordenadas';
+    private apiUrl: string = URL_GATEWAY_API + '/worker-position/coordenadas';
 
     constructor(private http: HttpClient) {
     }

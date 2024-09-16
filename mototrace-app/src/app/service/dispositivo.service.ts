@@ -2,13 +2,13 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {Dispositivo} from "../../models/Dispositivo";
-import {API_URL_DISPOSITIVOS} from "../constants/constants";
+import {URL_GATEWAY_API} from "../constants/constants";
 
 @Injectable({
     providedIn: 'root'
 })
 export class DispositivoService {
-    private apiUrl: string = API_URL_DISPOSITIVOS + '/dispositivos';
+    private apiUrl: string = URL_GATEWAY_API + '/mototrace-api/dispositivos';
 
     constructor(private http: HttpClient) {
     }

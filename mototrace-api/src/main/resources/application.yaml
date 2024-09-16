@@ -10,6 +10,6 @@ spring:
       ddl-auto: update
 
 server:
-  port: 8090
+  port: 8091
   servlet:
     context-path: /api/v1

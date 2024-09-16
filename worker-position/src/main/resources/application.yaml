@@ -10,9 +10,8 @@ spring:
       authentication-database: admin
       database: mototrace
 
-
 server:
-  port: 8091
+  port: 8092
   servlet:
     context-path: /api/v1
 
@@ -23,4 +22,4 @@ variaveis:
     client-id-producer: WORKER_POSITION_PRODUCER
   feign:
     mototrace-api:
-      url: http://localhost:8090/api/v1
+      url: http://localhost:8091/api/v1
