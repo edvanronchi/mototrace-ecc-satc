@@ -33,7 +33,6 @@ A seguir, algumas das principais tecnologias e ferramentas empregadas no projeto
 - Spring Cloud OpenFeign
 
 #### Dispositivo Rastreador (ESP32)
-- MPU6050: Sensor de movimento
 - TinyGPSPlus: Biblioteca para processar dados recebidos de módulos GPS
 - PubSubClient: Biblioteca para comunicação via protocolo MQTT
 - FreeRTOS: Biblioteca que gerencia múltiplas tarefas com threads
