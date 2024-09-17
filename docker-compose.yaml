@@ -1,4 +1,11 @@
 services:
+  mototrace-app:
+    build:
+      context: mototrace-app
+    container_name: mototrace-app
+    ports:
+      - "8080:80"
+  
   gateway-api:
     build:
       context: gateway-api

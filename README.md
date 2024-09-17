@@ -55,23 +55,31 @@ Um resumo das funções atendidas por cada aplicação.
 - [mototrace-device](mototrace-device/README.md)
 
 ### 2.3 Diagrama de Arquitetura
-![](images/diagram.gif)
+![](images/diagrama.gif)
 
-## 3. Instalação
+## 3. Dispositivo Rastreador
+O dispositivo foi montado em uma protoboard, utilizando um ESP32, um módulo GPS, um módulo LoRa e um sensor acelerômetro. Ele conta com dois LEDs indicadores: um para sinalizar o bloqueio físico e outro para o bloqueio lógico da motocicleta.
 
-### 3.1 Pré-requisitos
+![](images/dispositivo.jpeg)
+
+## 4. Instalação 
+
+### 4.1 Pré-requisitos
 Certifique-se de que o Docker está instalado e funcionando corretamente em seu sistema. Verifique se as portas 8080, 8090, 8091, e 8092 não estão atualmente em uso.
 
-### 3.2 Instruções de Instalação
+### 4.2 Instruções de Instalação
 Execute o seguinte comando para criar e iniciar os contêineres necessários:
+```sh
+docker compose up --build -d
+```
 
-### 3.3 Acesso à Aplicação
+### 4.3 Acesso à Aplicação
 ```
 http://localhost:4200
 ```
 
-## 4. xxx
-
+### 4.4 Compilação do Código para o Dispositivo
+A programação do ESP32 foi realizada utilizando a ferramenta Arduino IDE. O [código fonte](mototrace-device/mototrace-device.ino), pode ser compilado e transferido para o dispositivo através dessa IDE.
 
 ## 5. Roadmap
 
