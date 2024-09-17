@@ -5,7 +5,7 @@
 ### 1.1 Visão Geral
 O dispositivo rastreador oferece monitoramento em tempo real para motocicletas, integrado a uma aplicação web totalmente responsiva. A plataforma permite que os usuários registrem dispositivos, bloqueiem remotamente a motocicleta, acompanhem a localização em tempo real e recebam notificações de eventos relevantes.
 
-![](images/plataforma.mp4)
+![](images/plataforma.gif)
 
 ### 1.2 Objetivos
 - Desenvolver interfaces responsivas
