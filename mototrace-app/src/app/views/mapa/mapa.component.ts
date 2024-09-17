@@ -129,19 +129,17 @@ export class MapaComponent implements OnInit, OnDestroy {
             ultimosPolylines[dispositivo.codigo] = polyline;
         }
 
-        function formatarDataHora(dataHoraArray: number[]): string {
-            const [ano, mes, dia, hora, minuto, segundo] = dataHoraArray;
+        function formatarDataHora(isoString: string): string {
+            const date = new Date(isoString);
 
-            const date = new Date(ano, mes - 1, dia, hora, minuto, segundo);
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const seconds = date.getSeconds().toString().padStart(2, '0');
 
-            const diaFormatado = String(date.getDate()).padStart(2, '0');
-            const mesFormatado = String(date.getMonth() + 1).padStart(2, '0');
-            const anoFormatado = date.getFullYear();
-            const horasFormatadas = String(date.getHours()).padStart(2, '0');
-            const minutosFormatados = String(date.getMinutes()).padStart(2, '0');
-            const segundosFormatados = String(date.getSeconds()).padStart(2, '0');
-
-            return `${diaFormatado}/${mesFormatado}/${anoFormatado} ${horasFormatadas}:${minutosFormatados}:${segundosFormatados}`;
+            return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
         }
 
         function gerarMarcadorUltimaLocalizacao(dispositivo: Dispositivo, coordenada: Coordenada, colorHex: string) {

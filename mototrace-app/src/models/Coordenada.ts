@@ -3,5 +3,5 @@ export interface Coordenada {
     codigoDispositivo: string;
     latitude: number;
     longitude: number;
-    dataHora: number[];
+    dataHora: string;
 }
