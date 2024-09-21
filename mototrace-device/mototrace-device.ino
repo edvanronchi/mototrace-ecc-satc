@@ -6,9 +6,9 @@
 #include <PubSubClient.h>
 #include <HardwareSerial.h>
 
-const String DISPOSITIVO_ID = "XYZ_1";
+const String DISPOSITIVO_ID = "XYZ_2";
 
-const int SEGUNDOS_ENVIO_COORDENADAS = 5;
+const int SEGUNDOS_ENVIO_COORDENADAS = 10;
 const int SEGUNDOS_ESPERA_PROXIMA_MOVIMENTACAO = 10;
 
 // Configurações do MPU6050
@@ -306,15 +306,8 @@ void ColetarCoordenadas(void* parameter) {
     if (gps.location.isValid()) {
       globalLatitude = gps.location.lat();
       globalLongitude = gps.location.lng();
-
-      Serial.println(globalLatitude, 5);
-      Serial.println(globalLongitude, 5);
-
-      vTaskDelay(2000 / portTICK_PERIOD_MS);
-    } else {
-      Serial.print(".");
-      vTaskDelay(1 / portTICK_PERIOD_MS);
     }
+    vTaskDelay(10 / portTICK_PERIOD_MS);
   }
 }
 

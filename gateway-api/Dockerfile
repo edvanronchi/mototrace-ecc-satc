@@ -1,7 +1,18 @@
-FROM openjdk:22-jdk-slim
+FROM eclipse-temurin:21-jdk-alpine AS builder
+
+RUN apk add --no-cache maven
 
 WORKDIR /app
 
-COPY target/gateway-api-*.jar /app/
+COPY pom.xml .
+COPY src ./src
 
-ENTRYPOINT ["java", "-jar", "/app/gateway-api-*.jar"]
+RUN mvn clean package -DskipTests
+
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app/target/gateway-api-*.jar /app/gateway-api.jar
+
+ENTRYPOINT ["java", "-jar", "/app/gateway-api.jar"]

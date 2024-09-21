@@ -3,8 +3,8 @@ spring:
     time-zone: America/Sao_Paulo
   data:
     mongodb:
-      host: localhost
-      port: 27017
+      host: ${DB_HOST:localhost}
+      port: ${DB_PORT:27017}
       username: user
       password: pass
       authentication-database: admin
@@ -22,4 +22,4 @@ variaveis:
     client-id-producer: WORKER_POSITION_PRODUCER
   feign:
     mototrace-api:
-      url: http://localhost:8091/api/v1
+      url: http://${ROUTE_HOST_MOTOTRACE_API:localhost}:8091/api/v1

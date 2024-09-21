@@ -13,6 +13,9 @@ services:
     restart: always
     ports:
       - "8090:8090"
+    environment:
+      - ROUTE_HOST_MOTOTRACE_API=mototrace-api
+      - ROUTE_HOST_WORKER_POSITION=worker-position
 
   mototrace-api:
     build:
@@ -21,6 +24,9 @@ services:
     restart: always
     ports:
       - "8091:8091"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
     depends_on:
       postgres:
         condition: service_started
@@ -32,6 +38,10 @@ services:
     restart: always
     ports:
       - "8092:8092"
+    environment:
+      - DB_HOST=mongodb
+      - DB_PORT=5432
+      - ROUTE_HOST_MOTOTRACE_API=mototrace-api
     depends_on:
       mongodb:
         condition: service_started

@@ -1,17 +1,19 @@
-FROM node:20.10-alpine as build
+FROM node:20.17-alpine as build
 
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm ci -f
+RUN npm install -g @angular/cli
 
 COPY . .
 
-RUN npm run build
+RUN npm run build --configuration=production
 
 FROM nginx:alpine
 
-COPY --from=build /app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist/mototrace/browser /usr/share/nginx/html
 
 CMD ["nginx", "-g", "daemon off;"]
