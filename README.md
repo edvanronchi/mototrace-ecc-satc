@@ -47,8 +47,7 @@ A seguir, algumas das principais tecnologias e ferramentas empregadas no projeto
 - Docker Compose
 
 ### 2.2 Microserviços
-Um resumo das funções atendidas por cada aplicação.
-
+Um resumo das funções atendidas por cada projeto
 - [gateway-api](gateway-api/README.md)
 - [mototrace-app](mototrace-app/README.md)
 - [mototrace-api](mototrace-api/README.md)
@@ -76,7 +75,7 @@ docker compose up --build -d
 
 ### 4.3 Acesso à Aplicação
 ```
-http://localhost:4200
+http://localhost:8080
 ```
 
 ### 4.4 Compilação do Código para o Dispositivo

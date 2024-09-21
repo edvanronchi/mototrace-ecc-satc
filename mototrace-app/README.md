@@ -1,7 +1,7 @@
 # Documentação
 
 ## Introdução
-xxxxxxxxxxx
+A plataforma proporciona monitoramento em tempo real para motocicletas, permitindo que os usuários registrem seus dispositivos, bloqueiem remotamente suas motos, acompanhem a localização ao vivo e recebam notificações sobre eventos importantes. A interface é intuitiva e totalmente responsiva, garantindo uma experiência de uso facilitada.
 
 ## Pré-requisitos
 
@@ -25,14 +25,14 @@ npm install -g @angular/cli
 ### Instalação
 
 ``` bash
-$ npm install
-$ npm update
+npm install
+npm update
 ```
 
 ### Uso básico
 
 ``` bash
-$ npm start
+npm start
 ```
 
 Navegue até [http://localhost:4200](http://localhost:4200). O aplicativo será recarregado automaticamente se você alterar qualquer um dos arquivos de origem..
@@ -42,5 +42,5 @@ Navegue até [http://localhost:4200](http://localhost:4200). O aplicativo será 
 Execute `build` para compilar o projeto. Os artefatos da compilação serão armazenados no diretório `dist/`.
 
 ```bash
-$ npm run build
+npm run build
 ```
