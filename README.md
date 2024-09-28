@@ -5,7 +5,7 @@
 ### 1.1 Visão Geral
 A plataforma proporciona monitoramento em tempo real para motocicletas, permitindo que os usuários registrem seus dispositivos, bloqueiem remotamente suas motos, acompanhem a localização ao vivo e recebam notificações sobre eventos importantes. A interface é intuitiva e totalmente responsiva, garantindo uma experiência de uso facilitada. Para realizar o monitoramento, a plataforma utiliza um dispositivo rastreador que se comunica constantemente, assegurando uma aplicação mais segura e eficiente.
 
-![](images/plataform.gif)
+![](images/plataforma.gif)
 
 ### 1.2 Objetivos
 - Desenvolver interfaces responsivas
