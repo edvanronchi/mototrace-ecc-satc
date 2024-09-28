@@ -10,7 +10,7 @@ A plataforma proporciona monitoramento em tempo real para motocicletas, permitin
 ### 1.2 Objetivos
 - Desenvolver interfaces responsivas
 - Aprimorar o conhecimento em `Angular`
-- Implementar o protocolo `MQT` a comunicação dispositivo/servidor
+- Implementar o protocolo `MQTT` a comunicação dispositivo/servidor
 - Integrar o `Google Maps` com o uso de seu framework
 - Gerencia múltiplas tarefas com threads no `ESP32` utilizando `RTOS`
 - Utilizar o protocolo `LoRaWAN` para estabelecer comunicação em rede mesh entre dispositivos, garantindo conectividade em áreas sem cobertura de rede
