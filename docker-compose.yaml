@@ -40,7 +40,7 @@ services:
       - "8092:8092"
     environment:
       - DB_HOST=mongodb
-      - DB_PORT=5432
+      - DB_PORT=27017
       - ROUTE_HOST_MOTOTRACE_API=mototrace-api
     depends_on:
       mongodb:
